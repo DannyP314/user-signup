@@ -45,7 +45,7 @@ class MainHandler(webapp2.RequestHandler):
         username = self.request.get("username")
         email = self.request.get("email")
 
-        usererror = self.request.get("error")
+        usererror = self.request.get("usererror")
         if usererror:
             error_esc = cgi.escape(usererror, quote=True)
             error_element = '<b class = "error">' + error_esc + '</b>'
@@ -87,13 +87,13 @@ class Welcome(webapp2.RequestHandler):
         email = self.request.get("email")
 
         if username == "": #checks for username input
-            usererror = "Please enter a username"
-            self.redirect("/?error=" + usererror)
+            usererror = "Please enter a Username"
+            self.redirect("/?usererror=" + usererror)
         elif valid_username(username):
             self.response.write("Welcome, " + username + "!")
         else:
-            usererror = "{0} is not a valid Username!".format(username)
-            self.redirect("/?error=" + usererror)
+            usererror = "{0} is not a valid Username".format(username)
+            self.redirect("/?usererror=" + usererror)
 
 
 app = webapp2.WSGIApplication([
