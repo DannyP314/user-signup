@@ -93,7 +93,7 @@ class Welcome(webapp2.RequestHandler):
             self.response.write("Welcome, " + username + "!")
         else:
             usererror = "{0} is not a valid Username".format(username)
-            self.redirect("/?usererror=" + usererror)
+            self.redirect("/?usererror=" + usererror + "&username=" + username)
 
 
 app = webapp2.WSGIApplication([
