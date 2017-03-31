@@ -40,35 +40,56 @@ def valid_username(username):
     user_re = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
     return user_re.match(username)
 
+def valid_password(password):
+    password_re = re.compile(r"^.{3,20}$")
+    return password_re.match(password)
+
+def valid_email(email):
+    email_re = re.compile(r"^[\S]+@[\S]+.[\S]+$")
+    return email_re.match(email)
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         username = self.request.get("username")
         email = self.request.get("email")
 
         usererror = self.request.get("usererror")
+        usererror_element = ""
         if usererror:
-            error_esc = cgi.escape(usererror, quote=True)
-            error_element = '<b class = "error">' + error_esc + '</b>'
+            usererror_esc = cgi.escape(usererror, quote=True)
+            usererror_element = '<b class = "error">' + usererror_esc + '</b>'
         else:
             error_element = ''
+
+        passerror = self.request.get("passerror")
+        passerror_element = ''
+        if passerror:
+            passerror_esc = cgi.escape(passerror, quote=True)
+            passerror_element = '<b class="error">' + passerror_esc + '</b>'
+
+        emailerror = self.request.get("emailerror")
+        if emailerror:
+            emailerror_esc = cgi.escape(emailerror, quote=True)
+            emailerror_element = '<b class="error">' + emailerror_esc + '</b>'
+
 
         user_form = """
         <form action="/welcome" method="post">
           <label>Username: </label>
           <input type="text" name="username" value="{0}"/>
-        """.format(username) + error_element + "<br>"
+        """.format(username) + usererror_element + "<br>"
 
         pass_form = """
           <label>Password: </label>
-          <input type="text" name="password" /><br>
+          <input type="text" name="password" />{0}<br>
           <label>Confirm Password: </label>
           <input type="text" name="verify" /><br>
-        """
+        """.format(passerror_element)
         email_form = """
           <label>E-mail Address: </label>
-          <input type="text" name="email" value="{0}" /><br>
+          <input type="text" name="email" value="{0}" />{1}<br>
           <input type="submit" value="Submit Form"/>
-        """.format(email)
+        """.format(email, emailerror_element)
 
 
 
@@ -88,12 +109,34 @@ class Welcome(webapp2.RequestHandler):
 
         if username == "": #checks for username input
             usererror = "Please enter a Username"
-            self.redirect("/?usererror=" + usererror)
-        elif valid_username(username):
+            self.redirect("/?usererror=" + usererror + "&email=" + email)
+        elif valid_username(username): #checks validity of username
             self.response.write("Welcome, " + username + "!")
         else:
             usererror = "{0} is not a valid Username".format(username)
-            self.redirect("/?usererror=" + usererror + "&username=" + username)
+            self.redirect("/?usererror=" + usererror + "&username=" + username + "&email=" + email)
+
+        if password == "": #checks for password
+            passerror = "Please enter a password"
+            self.redirect("/?passerror=" + passerror + "&username=" + username + "&email=" + email)
+        elif valid_password(password):
+            if password == verify:
+                self.response.write("")
+            else:
+                passerror = "Passwords do not match"
+                self.redirect("/?passerror=" + passerror + "&username=" + username + "&email=" + email)
+        else:
+            passerror = "Password is not valid"
+            self.redirect("/?passerror=" + passerror + "&username=" + username + "&email=" + email)
+
+        if email == "":
+            emailerror = "Please enter an email"
+            self.redirect("/?emailerror=" + emailerror + "&username=" + username + "&email=" + email)
+        elif valid_email(email):
+            self.response.write("")
+        else:
+            emailerror = "{0} is not a valid E-mail".format(email)
+            self.redirect("/?emailerror=" + emailerror + "&username=" + username + "&email=" + email)
 
 
 app = webapp2.WSGIApplication([
