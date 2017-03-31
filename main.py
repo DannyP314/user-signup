@@ -68,6 +68,7 @@ class MainHandler(webapp2.RequestHandler):
             passerror_element = '<b class="error">' + passerror_esc + '</b>'
 
         emailerror = self.request.get("emailerror")
+        emailerror_element = ""
         if emailerror:
             emailerror_esc = cgi.escape(emailerror, quote=True)
             emailerror_element = '<b class="error">' + emailerror_esc + '</b>'
@@ -81,9 +82,9 @@ class MainHandler(webapp2.RequestHandler):
 
         pass_form = """
           <label>Password: </label>
-          <input type="text" name="password" />{0}<br>
+          <input type="password" name="password" />{0}<br>
           <label>Confirm Password: </label>
-          <input type="text" name="verify" /><br>
+          <input type="password" name="verify" /><br>
         """.format(passerror_element)
         email_form = """
           <label>E-mail Address: </label>
